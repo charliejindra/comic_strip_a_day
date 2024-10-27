@@ -19,10 +19,10 @@ def getdata(url):
 	r = requests.get(url) 
 	return r.text 
 
-def create_message(sender, to, subject, message_text):
+def create_message(sender, to_list, subject, message_text):
     """Create a message for an email."""
     message = MIMEText(message_text, 'html')
-    message['to'] = to
+    message['to'] = ', '.join(to_list)
     message['from'] = sender
     message['subject'] = subject
     raw = base64.urlsafe_b64encode(message.as_bytes())
@@ -64,9 +64,9 @@ url = imageList[4]['src']
 
 # can i tear this out? show the image on screen.
 # i should just need the URL
-response = requests.get(url)
-img = Image.open(BytesIO(response.content))
-img.show(BytesIO(response.content))
+# response = requests.get(url)
+# img = Image.open(BytesIO(response.content))
+# img.show(BytesIO(response.content))
 
 # update date for tomorrow's strip
 date += timedelta(days=1)
@@ -99,14 +99,33 @@ service = build('gmail', 'v1', credentials=creds)
 
 # Create the email content
 # sender -> recipient
-currentDate = datetime.today().strftime('%Y-%m-%d')
+currentDate = datetime.today().strftime('%m-%d-%Y')
+formatOldDate = date.strftime('%m-%d-%Y')
 msgBody =f"""
 <html>
-	<h2>Calvin And Hobbes {currentDate}</h2>
-	<h3>Original run date - {date}</h3>
-	<img src='{url}'>
+	<div style="align: center">
+		<h2>Calvin And Hobbes {currentDate}</h2>
+		<h3>Original run date - {formatOldDate}</h3>
+		<img src='{url}'>
+	</div>
 </html>
 """
 
-message = create_message("charlessjindra@gmail.com", "charlessjindra@gmail.com", "Subject Here", msgBody)
+recipients = [
+	"charlessjindra@gmail.com", 
+	"pianogirlygirl@gmail.com",
+	"cdbuilds@gmail.com",
+	"jdarby813@gmail.com",
+	"jackschaeffer@rocketmail.com",
+	"hawley5150@yahoo.com",
+	"bizbet16@yahoo.com",
+	"graceeb1524@gmail.com",
+	"peterfjindra@gmail.com"
+]
+#FOR TESTING COMMENT OUT THE ABOVE AND UNCOMMENT BELOW RECIPIENTS
+# recipients = [
+# 	"charlessjindra@gmail.com"
+# ]
+
+message = create_message("charlessjindra@gmail.com", recipients, f"Calvin and Hobbes {currentDate}", msgBody)
 send_message(service, "me", message)
