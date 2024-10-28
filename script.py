@@ -11,6 +11,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
+from time import sleep
 
 # If modifying these SCOPES, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
@@ -40,92 +41,102 @@ def send_message(service, user_id, message):
         return None
 
 
-# WEB SCRAPING
-# get the date of the next comic to send
-dateRaw = open('date.txt','r').read()
-print(dateRaw)
-date = date.fromisoformat(dateRaw.replace('/','-'))
-print(date)
+while True:
+	time = datetime.now()
+	# run every morning at 5am
+	while (time.hour != 5) or (time.minute != 0) or (time.second > 5):
+		print(time.hour, time.minute, time.second)
+		sleep(1)
+		time = datetime.now()
 
-# scrape gocomics
-formattedDate = dateRaw.replace('-','/')
-htmldata = getdata(f'https://www.gocomics.com/calvinandhobbes/{formattedDate}') 
-soup = BeautifulSoup(htmldata, 'html.parser') 
+	# WEB SCRAPING
+	# get the date of the next comic to send
+	dateRaw = open('date.txt','r').read()
+	print(dateRaw)
+	date = date.fromisoformat(dateRaw.replace('/','-'))
+	print(date)
 
-imageList = soup.find_all('img')
+	# scrape gocomics
+	formattedDate = dateRaw.replace('-','/')
+	htmldata = getdata(f'https://www.gocomics.com/calvinandhobbes/{formattedDate}') 
+	soup = BeautifulSoup(htmldata, 'html.parser') 
 
-print(len(imageList))
+	imageList = soup.find_all('img')
 
-for image in imageList:
-    print(image['src'])
+	print(len(imageList))
 
-# so far this seems to be the index that the comic always is. stay tuned
-url = imageList[4]['src']
+	for image in imageList:
+		print(image['src'])
 
-# can i tear this out? show the image on screen.
-# i should just need the URL
-# response = requests.get(url)
-# img = Image.open(BytesIO(response.content))
-# img.show(BytesIO(response.content))
+	# so far this seems to be the index that the comic always is. stay tuned
+	url = imageList[4]['src']
 
-# update date for tomorrow's strip
-date += timedelta(days=1)
-file = open('date.txt', 'w')
-dateRaw = str(date)
-file.write(dateRaw)
+	# can i tear this out? show the image on screen.
+	# i should just need the URL
+	# response = requests.get(url)
+	# img = Image.open(BytesIO(response.content))
+	# img.show(BytesIO(response.content))
 
-"""Shows basic usage of the Gmail API.
-Sends an email.
-"""
-creds = None
-# The file token.json stores the user's access and refresh tokens, and is
-# created automatically when the authorization flow completes for the first
-# time.
-if os.path.exists('token.json'):
-	creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-# If there are no (valid) credentials available, let the user log in.
-if not creds or not creds.valid:
-	if creds and creds.expired and creds.refresh_token:
-		creds.refresh(Request())
-	else:
-		flow = InstalledAppFlow.from_client_secrets_file(
-			'credentials.json', SCOPES)
-		creds = flow.run_local_server(port=0)
-	# Save the credentials for the next run
-	with open('token.json', 'w') as token:
-		token.write(creds.to_json())
+	# update date for tomorrow's strip
+	date += timedelta(days=1)
+	file = open('date.txt', 'w')
+	dateRaw = str(date)
+	file.write(dateRaw)
 
-service = build('gmail', 'v1', credentials=creds)
+	"""Shows basic usage of the Gmail API.
+	Sends an email.
+	"""
+	creds = None
+	# The file token.json stores the user's access and refresh tokens, and is
+	# created automatically when the authorization flow completes for the first
+	# time.
+	if os.path.exists('token.json'):
+		creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+	# If there are no (valid) credentials available, let the user log in.
+	if not creds or not creds.valid:
+		if creds and creds.expired and creds.refresh_token:
+			creds.refresh(Request())
+		else:
+			flow = InstalledAppFlow.from_client_secrets_file(
+				'credentials.json', SCOPES)
+			creds = flow.run_local_server(port=0)
+		# Save the credentials for the next run
+		with open('token.json', 'w') as token:
+			token.write(creds.to_json())
 
-# Create the email content
-# sender -> recipient
-currentDate = datetime.today().strftime('%m-%d-%Y')
-formatOldDate = date.strftime('%m-%d-%Y')
-msgBody =f"""
-<html>
-	<div style="align: center">
-		<h2>Calvin And Hobbes {currentDate}</h2>
-		<h3>Original run date - {formatOldDate}</h3>
-		<img src='{url}'>
-	</div>
-</html>
-"""
+	service = build('gmail', 'v1', credentials=creds)
 
-recipients = [
-	"charlessjindra@gmail.com", 
-	"pianogirlygirl@gmail.com",
-	"cdbuilds@gmail.com",
-	"jdarby813@gmail.com",
-	"jackschaeffer@rocketmail.com",
-	"hawley5150@yahoo.com",
-	"bizbet16@yahoo.com",
-	"graceeb1524@gmail.com",
-	"peterfjindra@gmail.com"
-]
-#FOR TESTING COMMENT OUT THE ABOVE AND UNCOMMENT BELOW RECIPIENTS
-# recipients = [
-# 	"charlessjindra@gmail.com"
-# ]
+	# Create the email content
+	# sender -> recipient
+	currentDate = datetime.today().strftime('%m-%d-%Y')
+	formatOldDate = date.strftime('%m-%d-%Y')
+	msgBody =f"""
+	<html>
+		<div style="align: center">
+			<h2>Calvin And Hobbes {currentDate}</h2>
+			<h3>Original run date - {formatOldDate}</h3>
+			<img src='{url}'>
+		</div>
+	</html>
+	"""
 
-message = create_message("charlessjindra@gmail.com", recipients, f"Calvin and Hobbes {currentDate}", msgBody)
-send_message(service, "me", message)
+	recipients = [
+		"charlessjindra@gmail.com", 
+		"pianogirlygirl@gmail.com",
+		"cdbuilds@gmail.com",
+		"jdarby813@gmail.com",
+		"jackschaeffer@rocketmail.com",
+		"hawley5150@yahoo.com",
+		"bizbet16@yahoo.com",
+		"graceeb1524@gmail.com",
+		"peterfjindra@gmail.com"
+	]
+	#FOR TESTING COMMENT OUT THE ABOVE AND UNCOMMENT BELOW RECIPIENTS
+	# recipients = [
+	# 	"charlessjindra@gmail.com"
+	# ]
+
+	message = create_message("charlessjindra@gmail.com", recipients, f"Calvin and Hobbes {currentDate}", msgBody)
+	send_message(service, "me", message)
+
+	sleep(10)
