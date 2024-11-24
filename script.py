@@ -111,21 +111,21 @@ msgBody =f"""
 </html>
 """
 
-recipients = [
-	"charlessjindra@gmail.com", 
-	"pianogirlygirl@gmail.com",
-	"cdbuilds@gmail.com",
-	"jdarby813@gmail.com",
-	"jackschaeffer@rocketmail.com",
-	"hawley5150@yahoo.com",
-	"bizbet16@yahoo.com",
-	"graceeb1524@gmail.com",
-	"peterfjindra@gmail.com"
-]
-#FOR TESTING COMMENT OUT THE ABOVE AND UNCOMMENT BELOW RECIPIENTS
 # recipients = [
-# 	"charlessjindra@gmail.com"
+# 	"charlessjindra@gmail.com", 
+# 	"pianogirlygirl@gmail.com",
+# 	"cdbuilds@gmail.com",
+# 	"jdarby813@gmail.com",
+# 	"jackschaeffer@rocketmail.com",
+# 	"hawley5150@yahoo.com",
+# 	"bizbet16@yahoo.com",
+# 	"graceeb1524@gmail.com",
+# 	"peterfjindra@gmail.com"
 # ]
+# FOR TESTING COMMENT OUT THE ABOVE AND UNCOMMENT BELOW RECIPIENTS
+recipients = [
+	"charlessjindra@gmail.com"
+]
 
 message = create_message("charlessjindra@gmail.com", recipients, f"Calvin and Hobbes {currentDate}", msgBody)
 send_message(service, "me", message)
