@@ -44,10 +44,10 @@ def send_message(service, user_id, message):
 while True:
 	time = datetime.now()
 	# run every morning at 5am
-	while (time.hour != 5) or (time.minute != 0) or (time.second > 5):
-		print(time.hour, time.minute, time.second)
-		sleep(1)
-		time = datetime.now()
+	# while (time.hour != 5) or (time.minute != 0) or (time.second > 5):
+	# 	print(time.hour, time.minute, time.second)
+	# 	sleep(1)
+	# 	time = datetime.now()
 
 	# WEB SCRAPING
 	# get the date of the next comic to send
