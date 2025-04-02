@@ -44,10 +44,10 @@ def send_message(service, user_id, message):
 while True:
 	time = datetime.now()
 	# run every morning at 5am
-	while (time.hour != 5) or (time.minute != 0) or (time.second > 5):
-		print(time.hour, time.minute, time.second)
-		sleep(1)
-		time = datetime.now()
+	# while (time.hour != 5) or (time.minute != 0) or (time.second > 5):
+	# 	print(time.hour, time.minute, time.second)
+	# 	sleep(1)
+	# 	time = datetime.now()
 
 	# WEB SCRAPING
 	# get the date of the next comic to send
@@ -69,19 +69,9 @@ while True:
 		print(image['src'])
 
 	# so far this seems to be the index that the comic always is. stay tuned
+	# ok its not now lol as of 2-28-1986. hopefully itll be easy to figure out a way to get it
 	url = imageList[4]['src']
 
-	# can i tear this out? show the image on screen.
-	# i should just need the URL
-	# response = requests.get(url)
-	# img = Image.open(BytesIO(response.content))
-	# img.show(BytesIO(response.content))
-
-	# update date for tomorrow's strip
-	date += timedelta(days=1)
-	file = open('date.txt', 'w')
-	dateRaw = str(date)
-	file.write(dateRaw)
 
 	"""Shows basic usage of the Gmail API.
 	Sends an email.
@@ -95,6 +85,7 @@ while True:
 	# If there are no (valid) credentials available, let the user log in.
 	if not creds or not creds.valid:
 		if creds and creds.expired and creds.refresh_token:
+			print('went to refresh token flow')
 			creds.refresh(Request())
 		else:
 			flow = InstalledAppFlow.from_client_secrets_file(
@@ -120,18 +111,8 @@ while True:
 	</html>
 	"""
 
-	recipients = [
-		"charlessjindra@gmail.com", 
-		"pianogirlygirl@gmail.com",
-		"cdbuilds@gmail.com",
-		"jdarby813@gmail.com",
-		"jackschaeffer@rocketmail.com",
-		"hawley5150@yahoo.com",
-		"bizbet16@yahoo.com",
-		"graceeb1524@gmail.com",
-		"peterfjindra@gmail.com"
-	]
-	#FOR TESTING COMMENT OUT THE ABOVE AND UNCOMMENT BELOW RECIPIENTS
+
+	# FOR TESTING COMMENT OUT THE ABOVE AND UNCOMMENT BELOW RECIPIENTS
 	# recipients = [
 	# 	"charlessjindra@gmail.com"
 	# ]
@@ -139,4 +120,11 @@ while True:
 	message = create_message("charlessjindra@gmail.com", recipients, f"Calvin and Hobbes {currentDate}", msgBody)
 	send_message(service, "me", message)
 
-	sleep(10)
+	# update date for tomorrow's strip
+	date += timedelta(days=1)
+	file = open('date.txt', 'w')
+	dateRaw = str(date)
+	file.write(dateRaw)
+
+	print("now waiting a while")
+	sleep(1000)
