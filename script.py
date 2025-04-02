@@ -12,6 +12,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from time import sleep
+import json
 
 # If modifying these SCOPES, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
@@ -110,12 +111,18 @@ while True:
 		</div>
 	</html>
 	"""
+	
 
+	# Example usage
+	file_path = "email_list.json"
+	with open(file_path, 'r', encoding='utf-8') as file:
+		data = json.load(file)
 
-	# FOR TESTING COMMENT OUT THE ABOVE AND UNCOMMENT BELOW RECIPIENTS
-	# recipients = [
-	# 	"charlessjindra@gmail.com"
-	# ]
+	# recipients = data.get("recipients", [])
+	# TO TEST UNCOMMENT THE LINE BELOW AND COMMENT THE LINE ABOVE
+	recipients = data.get("test_recipients", [])
+	print(recipients)
+
 
 	message = create_message("charlessjindra@gmail.com", recipients, f"Calvin and Hobbes {currentDate}", msgBody)
 	send_message(service, "me", message)
